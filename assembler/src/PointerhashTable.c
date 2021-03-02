@@ -1,6 +1,7 @@
 #include "headers/PointerhashTable.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 static uint32_t hash(const char *key, size_t len);
 
 Label* table[MAX_SIZE];
@@ -21,6 +22,15 @@ void printTable(){
        }
    }
 
+}
+
+bool isListEmpty(){
+    for(int i=0;i<MAX_SIZE;i++){
+        if(table[i]!=NULL){
+            return false;
+        }
+    }
+    return true;
 }
 
 bool addLabelToList(Label label){
@@ -52,11 +62,20 @@ bool getPointer(char* key,Pointer* dest){
 
     uint32_t i=hash(key,60)%MAX_SIZE;
      if(table[i]!=NULL){
-        dest=&(table[i]->value);
+        *dest=table[i]->value;
         return true;
      }
     printf("[ERROR]]%s NOT in list\n",key);
     return false;
+}
+
+void changeLabelValue(char *key,Pointer value){
+    uint32_t i=hash(key,60)%MAX_SIZE;
+    if(table[i]!=NULL){
+       Label *l=table[i];
+       l->value=value;
+    }
+
 }
 
 
