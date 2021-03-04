@@ -3,13 +3,15 @@
 #include <string.h>
 #include "headers/Instruction.h"
 #include "headers/PointerhashTable.h"
+#include "headers/hashMap.h"
 
 #define ERROR_TO_MANY_ARGS 0x4
 #define ERROR_TO_FEW_ARGS 0x6
 #define ERROR_FILE_NOT_FOUND 0x404
 
+uint32_t hash(const char *key, size_t len);
 
-int firstPass(FILE *File);
+int firstPass(HashMap* map,FILE *File);
 CPU_INSTRUCTION* secondPass(FILE *File);
 void writeFIle();
 int CheckIfProgramShouldRun(int argc,char *atgv[]);
@@ -18,31 +20,19 @@ TOKEN getToken(const char* arg);
 
 int main(int argc, char *argv[]){
     
-    int ERROR_CODE=CheckIfProgramShouldRun(argc,argv);
-    if(ERROR_CODE!=0){
-        return ERROR_CODE;
-    }
-    char* file=argv[1];
+ 
+
+ HashMap h=*(init(100,hash));
+float po=15.1;
 
 
-    initList();
-
-   FILE *filePointer;
-   filePointer= fopen(file,"r");
-   if(filePointer==NULL){
-     printf("[ERROR] FILE NOT FOUD");
-      exit(EXIT_FAILURE);
-   }
-  firstPass(filePointer);
-  rewind(filePointer);
-  secondPass(filePointer);
-  fclose(filePointer);
-  Pointer p;
-  if(getPointer("@start",&p)){
-     printf("%0x",p);
-  }
-
-  DeleteTable();
+ addNode(&h,"s",(void*)&po);
+float *po2;
+getValue(&h,"s",&po2);
+if(po2!=NULL){
+printf("%f\n",*po2);
+}
+  freeMap(&h);
   exit(0);
 }
 
@@ -52,15 +42,16 @@ int CheckIfProgramShouldRun(int argc,char *atgv[]){
       }else if(argc<2){
         return ERROR_TO_FEW_ARGS;
       }
-
+    
     return 0;
 }
 
 
 
 
-int firstPass(FILE *file){
-  
+int firstPass(HashMap* h,FILE *file){
+ 
+
    Pointer MEMLOCATION=0x90;
  char command[60];
 
@@ -124,5 +115,21 @@ CPU_INSTRUCTION* secondPass(FILE *file){
 
 
 }
-
+uint32_t hash(const char *key, size_t len)
+{
+    uint32_t hash, i;
+    for(hash = i = 0; i < len; ++i)
+    {
+        if(key[i]=='\0'){
+           break;
+        }
+        hash += key[i];
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+    }
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
 

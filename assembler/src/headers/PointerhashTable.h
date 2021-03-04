@@ -1,9 +1,10 @@
+#ifndef _POINTERHASH_H
+#define _POINTERHASH_H
 #include "Instruction.h"
 #include <stdbool.h>
 
 
-#ifndef _POINTERHASH_H
-#define _POINTERHASH_H
+
 #define MAX_SIZE 1000
 #define NULL_PTR 0xffff
 
@@ -13,7 +14,7 @@ typedef struct Label{
     char key[60]; 
     Pointer value;
 } Label;
-#endif
+
 
 bool isListEmpty();
 void initList();
@@ -22,6 +23,6 @@ void changeLabelValue(char *key,Pointer value);
 bool getPointer(char* key,Pointer* dest);
 void DeleteTable();
 void printTable();
-
+#endif
 
 

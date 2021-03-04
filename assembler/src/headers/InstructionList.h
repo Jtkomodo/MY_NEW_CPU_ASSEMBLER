@@ -1,7 +1,8 @@
-#include "Instruction.h"
-#include <stdbool.h>
 #ifndef LIST_H
 #define LIST_H
+
+#include "Instruction.h"
+#include <stdbool.h>
 
 typedef struct Node{
   void* value;
@@ -9,8 +10,9 @@ typedef struct Node{
 } Node;
 
 
-#endif
+
 void Push(void* i);
 void* pop();
 void clear();
 bool Empty();
+#endif

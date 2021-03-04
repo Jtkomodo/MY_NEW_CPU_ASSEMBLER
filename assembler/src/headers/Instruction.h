@@ -1,9 +1,10 @@
+
+#ifndef _Instruction_H
+#define _Instruction_H
 #include <stdint.h>
 
 
 
-#ifndef _Instruction_H
-#define _Instruction_H
 
 #define NOP     0x00
 #define MOVRAM 0x010

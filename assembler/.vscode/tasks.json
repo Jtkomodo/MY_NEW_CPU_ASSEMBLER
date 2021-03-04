@@ -7,8 +7,8 @@
 			"command": "C:\\MinGW\\bin\\gcc.exe",
 			"args": [
 				"-g",
-				"${workspaceFolder}/src/*.c",
 				"${workspaceFolder}/src/headers/*.h",
+				"${workspaceFolder}/src/*.c",
 				"-o",
 				"${workspaceFolder}\\start.exe"
 			],
