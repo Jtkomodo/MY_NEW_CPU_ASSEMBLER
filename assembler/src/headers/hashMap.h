@@ -5,7 +5,8 @@
 #ifndef HASH_TABLE
 #define HASH_TABLE
 typedef struct Node{
-    char key[60];
+    char key[16];
+    bool dynamic_ptr;
     void* value;
 } Node;
 
@@ -19,6 +20,6 @@ typedef struct HashMap{
 #endif
 
 HashMap* init(size_t capacity,uint32_t(*hash_func)(const char*,size_t len));
-bool addNode(HashMap* HashMap,const char *key,void* value);
+bool addNode(HashMap* HashMap,const char *key,void* value,bool dynamic);
 void getValue(HashMap* HashMap,const char* key,void** dest);
 void freeMap(HashMap *hashmap);

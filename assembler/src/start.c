@@ -4,13 +4,14 @@
 #include "headers/Instruction.h"
 #include "headers/PointerhashTable.h"
 #include "headers/hashMap.h"
+#include "headers/test.h"
 
 #define ERROR_TO_MANY_ARGS 0x4
 #define ERROR_TO_FEW_ARGS 0x6
 #define ERROR_FILE_NOT_FOUND 0x404
 
 uint32_t hash(const char *key, size_t len);
-
+void t(HashMap* h);
 int firstPass(HashMap* map,FILE *File);
 CPU_INSTRUCTION* secondPass(FILE *File);
 void writeFIle();
@@ -23,15 +24,15 @@ int main(int argc, char *argv[]){
  
 
  HashMap h=*(init(100,hash));
-float po=15.1;
 
+t(&h);
 
- addNode(&h,"s",(void*)&po);
 float *po2;
-getValue(&h,"s",&po2);
+getValue(&h,"s",(void**)&po2);
 if(po2!=NULL){
 printf("%f\n",*po2);
 }
+test(&h);
   freeMap(&h);
   exit(0);
 }
@@ -46,11 +47,14 @@ int CheckIfProgramShouldRun(int argc,char *atgv[]){
     return 0;
 }
 
-
+void t(HashMap* h){
+   float *p=malloc(sizeof(float));
+   *p=15.1f;
+  addNode(h,"s",(void*)p,true);
+}
 
 
 int firstPass(HashMap* h,FILE *file){
- 
 
    Pointer MEMLOCATION=0x90;
  char command[60];

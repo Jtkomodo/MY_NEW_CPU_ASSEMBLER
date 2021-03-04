@@ -27,7 +27,7 @@ HashMap* init(size_t capacity,uint32_t(*hash_func)(const char*,size_t len)){
 
 
 }
-bool addNode(HashMap* HashMap,const char *key,void* value){ 
+bool addNode(HashMap* HashMap,const char *key,void* value,bool dynamic){ 
   bool returnB=false;
   uint32_t i=(HashMap->func_prt(key,60))%HashMap->capacity;
   if(HashMap->array[i]==NULL){
@@ -37,6 +37,7 @@ bool addNode(HashMap* HashMap,const char *key,void* value){
        return false;
      }
      n->value=value;
+     n->dynamic_ptr=dynamic;
      strcpy(n->key,key);
      HashMap->array[i]=n;
      returnB=true;
@@ -51,10 +52,17 @@ bool addNode(HashMap* HashMap,const char *key,void* value){
 
 void freeMap(HashMap *hashmap){
     for(int i=0;i<hashmap->capacity;i++){
+       if(hashmap->array[i]!=NULL){
+        Node n=*(Node*)(hashmap->array[i]);
+        if(n.dynamic_ptr){
+           free(n.value);
+        }
+       }
       free(hashmap->array[i]);
       hashmap->array[i]=NULL;
       
     }
+    free(hashmap->array);
     free(hashmap);
 }
 
