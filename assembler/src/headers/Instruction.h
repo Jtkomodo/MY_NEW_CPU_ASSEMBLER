@@ -5,25 +5,32 @@
 
 #ifndef _Instruction_H
 #define _Instruction_H
-#define NOP     0x00
-#define MOVRAM 0x010
-#define MOVREG 0x020
-#define ADD16   0x11
-#define ADD8    0X08
+//OPCODE
+//N:real value;P:pointer;R:register
+#define NOP           0x00
+#define MOV_R_P       0x40
+#define MOV_R_N       0x50
+#define ADD16_REGA    0x16
+#define ALU8          0X18
+#define jump_P        0x20
 
 
+//conditions for jump this will be placed in extended op section
+#define IF_EQUAL     0
+#define IF_GREATOR   1
+#define IF_LESS      2
 
 typedef enum TOKEN_TYPE{
        null,
-       MEM_LOCATION,
+       POINTER,
        REGISTER,
        LABEL,
-       HEX_VALUE,
-       REAL_VALUE
+       number
 } TOKEN_TYPE;
+
 typedef struct TOKEN{
   TOKEN_TYPE type;
-  char* string;
+  char* string
 
 } TOKEN;
 
@@ -67,9 +74,14 @@ typedef union CPU_ARG{
 typedef struct CPU_INSTRUCTION
 {
       uint8_t OPCODE;
-      uint8_t reg;
+      uint8_t extended_OP;
       CPU_ARG arrgument;
 } CPU_INSTRUCTION;
+
+
+
+Instruction getInstructionFromTokens(TOKEN memoric,TOKEN arg,TOKEN arg2);
+
 #endif
 
 

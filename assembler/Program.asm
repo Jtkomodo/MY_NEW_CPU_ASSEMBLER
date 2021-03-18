@@ -1,4 +1,4 @@
-@start
+@start n
 mov &A,0x200 ;helllo
 sub 50
 mov [0x16],32
