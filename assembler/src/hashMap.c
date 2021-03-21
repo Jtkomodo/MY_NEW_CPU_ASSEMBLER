@@ -41,7 +41,7 @@ bool addNode(HashMap* HashMap,const char *key,void* value,bool dynamic){
      strcpy(n->key,key);
      HashMap->array[i]=n;
      returnB=true;
-     printf("array[%i]%s placed with address %0x\n",i,key,(n->value));
+   //  printf("array[%i]%s placed with address %0x\n",i,key,(n->value));
   }else{
     printf("HASH_MAP[ERROR]%s already exist use changeValue() instead\n",key);
   }
@@ -58,13 +58,36 @@ void freeMap(HashMap *hashmap){
            free(n.value);
         }
        }
-      free(hashmap->array[i]);
-      hashmap->array[i]=NULL;
+         free(hashmap->array[i]);
+     
+     
       
     }
-    free(hashmap->array);
+    //free(hashmap->array);
     free(hashmap);
 }
+
+bool addNodes(HashMap* HashMap,Node array[],int sizeOfArrray){
+    for(int i=0;i<sizeOfArrray;i++){
+       Node n=array[i];
+        if(!addNode(HashMap,n.key,n.value,n.dynamic_ptr)){
+          return false;
+        }
+         
+
+    }
+   return true;
+
+}
+bool hasKey(HashMap* HashMap,const char *key){
+ uint32_t i=(HashMap->func_prt(key,60))%HashMap->capacity;
+ if(HashMap->array[i]!=NULL){
+    return true;
+ } else{
+   return false;
+ }    
+}
+
 
 void getValue(HashMap* HashMap,const char* key,void** dest){
  uint32_t i=(HashMap->func_prt(key,60))%HashMap->capacity;
@@ -73,11 +96,32 @@ void getValue(HashMap* HashMap,const char* key,void** dest){
      *(dest)=n.value;
      
   }else{
-    printf("HASHMAP[ERROR]%s does not exist in the map",key);
+    //printf("HASHMAP[ERROR]%s does not exist in the map",key);
     *(dest)= NULL;
   }
 
 }
+
+
+
+uint32_t hash(const char *key, size_t len)
+{
+    uint32_t hash, i;
+    for(hash = i = 0; i < len; ++i)
+    {
+        if(key[i]=='\0'){
+           break;
+        }
+        hash += key[i];
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+    }
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
 
 
 

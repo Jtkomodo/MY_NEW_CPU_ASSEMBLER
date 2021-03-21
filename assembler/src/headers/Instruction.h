@@ -1,36 +1,31 @@
 
-#include <stdint.h>
-
-
 
 #ifndef _Instruction_H
 #define _Instruction_H
-//OPCODE
-//N:real value;P:pointer;R:register
-#define NOP           0x00
-#define MOV_R_P       0x40
-#define MOV_R_N       0x50
-#define ADD16_REGA    0x16
-#define ALU8          0X18
-#define jump_P        0x20
+#include <stdint.h>
+#include "Queue.h"
+#include "Error.h"
+#define LABEL_MARKER "@"
+#define MEMORY_MARKER "["
+#define MEMORY_MARKER_END "]"
+#define REGISTER_MARKER "&"
+#define HEX_MARKER "0x"
+#define BIN_MARKER "b"
 
 
-//conditions for jump this will be placed in extended op section
-#define IF_EQUAL     0
-#define IF_GREATOR   1
-#define IF_LESS      2
 
 typedef enum TOKEN_TYPE{
-       null,
+       NO,
        POINTER,
        REGISTER,
        LABEL,
-       number
+       NUMBER,
+       MEMORIC
 } TOKEN_TYPE;
 
 typedef struct TOKEN{
   TOKEN_TYPE type;
-  char* string
+  char* string;
 
 } TOKEN;
 
@@ -78,7 +73,7 @@ typedef struct CPU_INSTRUCTION
       CPU_ARG arrgument;
 } CPU_INSTRUCTION;
 
-
+TOKEN parseToToken(char* string,ERROR* error);
 
 Instruction getInstructionFromTokens(TOKEN memoric,TOKEN arg,TOKEN arg2);
 

@@ -5,16 +5,16 @@
 
 void freeQUEUE_NODE(int i,Q_NODE* node);
 void freeQueue(Queue* queue){
-      printf("[QUEUE]Queue free started\n");
+  //    printf("[QUEUE]Queue free started\n");
       if((queue->head!=NULL) &&(queue->tail!=NULL) ){
            
            freeQUEUE_NODE(1,queue->head);
       }else{
-        printf(" [QUEUE]EMPTY\n");
+ //       printf(" [QUEUE]EMPTY\n");
       }
     
       free(queue);
-       printf("[QUEUE]Queue freed\n");   
+   //    printf("[QUEUE]Queue freed\n");   
 }
 void freeQUEUE_NODE(int i,Q_NODE* node){
     
@@ -24,10 +24,10 @@ void freeQUEUE_NODE(int i,Q_NODE* node){
     }
     if(node->dynamic_ptr && node->value!=NULL){
       free(node->value);
-     printf(" [QUEUE]node[%i]value freed\n",i);    
+   //  printf(" [QUEUE]node[%i]value freed\n",i);    
     }
     free(node);
-     printf(" [QUEUE]node[%i] freed\n",i);  
+    // printf(" [QUEUE]node[%i] freed\n",i);  
 
 }
 //q=[v2]<-[v1]
@@ -37,7 +37,8 @@ void freeQUEUE_NODE(int i,Q_NODE* node){
 //   t     ot      h
 bool enQueue(Queue* queue,void* value,bool dynamic_ptr){
   bool succsess=false;
-  Q_NODE* node=(Q_NODE*)malloc(sizeof(Q_NODE));
+  size_t i=sizeof(Q_NODE);
+  Q_NODE* node=(Q_NODE*)(malloc(sizeof(Q_NODE)));
   if(node!=NULL){
     node->value=value;
     node->dynamic_ptr=dynamic_ptr;
