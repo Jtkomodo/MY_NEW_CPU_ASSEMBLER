@@ -1,5 +1,6 @@
 #include "headers/Syntax.h"
 #include <string.h>
+#include "headers/CAT.h"
 #define AMOUNT_OF_KEY_WORDS 3
 #define AMOUNT_OF_MOV_RULES 4
 #define AMOUNT_OF_ADD_RULES 1
@@ -55,7 +56,9 @@ void freeSyntax(){
 
 
 SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
-      char* syntax_error="SYNTAX_ERROR";  
+      char* syntax_error="SYNTAX_ERROR ";
+      char* a_tpye=TOKEN_TYPE_STRINGS[a]; 
+      char* b_tpye=TOKEN_TYPE_STRINGS[b];   
       SYNTAX* syntax=NULL;
       RULES* rules;
       getValue(&h,keyword,(void**)&rules);
@@ -70,24 +73,41 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
              }
           
          }
+         if(syntax==NULL){
+            char* NO_RULES="NO RULES IN THE FORMAT (";
+            char* COMMA=",";
+            char* MEM=") exist for Memoric ";
+              size_t i=strlen(syntax_error)+strlen(NO_RULES)+strlen(a_tpye)+strlen(COMMA)
+              +strlen(b_tpye)+strlen(MEM)+strlen(keyword)+1;
+                error->errorMessage=(char*)malloc(i);
+                char* strings[7]={
+                   syntax_error,
+                   NO_RULES,
+                   a_tpye,
+                   COMMA,
+                   b_tpye,
+                   MEM,
+                   keyword
+
+                };
+                CAT(error->errorMessage,strings,7);
+         }
         
       }else{
-        char* Memoric=" Memoric \"";
+        char* Memoric="Memoric \"";
         char* not_found="\" does not exist";
         size_t i=strlen(syntax_error)+strlen(Memoric)+strlen(keyword)+strlen(not_found)+1;
         error->errorMessage=(char*)malloc(i);
-        strcpy(error->errorMessage,syntax_error);
-        char* strings[3]={
+       
+        char* strings[4]={
+             syntax_error,
              Memoric,
              keyword,
              not_found
         };
-      for(int i=0;i<3;i++){
-       char* string=strings[i];
-       strcat(error->errorMessage,string);
-       }
-   
+       CAT(error->errorMessage,strings,4);
       }
 
       return syntax;
 }
+

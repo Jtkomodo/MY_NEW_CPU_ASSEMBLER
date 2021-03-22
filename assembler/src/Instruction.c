@@ -4,6 +4,17 @@
 #include "headers/Error.h"
 #include "headers/Error.h"
 
+char* TOKEN_TYPE_STRINGS[6]={
+       "NO",
+       "POINTER",
+       "REGISTER",
+       "LABEL",
+       "NUMBER",
+       "MEMORIC"
+
+
+};
+
 TOKEN parseToToken(char* string,ERROR* error){
      TOKEN t;
     bool errors=false;

@@ -1,3 +1,3 @@
 @start
 
-jp @s
+jmp @s

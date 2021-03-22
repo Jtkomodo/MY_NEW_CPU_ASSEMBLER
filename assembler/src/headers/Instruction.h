@@ -13,7 +13,7 @@
 #define BIN_MARKER "b"
 
 
-
+extern char* TOKEN_TYPE_STRINGS[6];
 typedef enum TOKEN_TYPE{
        NO,
        POINTER,

@@ -6,6 +6,7 @@
 #include "headers/Queue.h"
 #include "headers/Error.h"
 #include "headers/Syntax.h"
+#include "headers/CAT.h"
 
 #define ERROR_TO_MANY_ARGS 0x4
 #define ERROR_TO_FEW_ARGS 0x6
@@ -192,10 +193,22 @@ while(!QueueIsEmpty(&labelsDefinedLater)){
     Label_entry* label=deQueue(&labelsDefinedLater);
     if(!hasKey(h,label->string)){
        ERROR* e=(ERROR*)malloc(sizeof(ERROR));
-        e->errorMessage=(char*)malloc(sizeof(char)*32);
-        strcpy(e->errorMessage,"Label not defined");
-        e->lineNumber=label->lineNumber;
-        enQueue(&errorList,e,true);
+       char* l="Label ";
+       char* not_defined=" not defined";
+       size_t i=strlen(l)+strlen(label->string)+strlen(not_defined)+1;
+       e->errorMessage=(char*)malloc(i);
+       char* strings[3]={
+          l,
+          label->string,
+          not_defined,
+       };
+
+
+       CAT(e->errorMessage,strings,3);
+
+        
+       e->lineNumber=label->lineNumber;
+       enQueue(&errorList,e,true);
      
     }
    free(label->string);
@@ -213,7 +226,6 @@ while(!QueueIsEmpty(&errorList)){
     }
       
 }
-
 printf("ERRORS %i",errors);
 
 freeQueue(&labelsDefinedLater);
