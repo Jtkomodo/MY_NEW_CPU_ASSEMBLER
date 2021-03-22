@@ -304,9 +304,11 @@ int secondPass(Queue* instructions,HashMap* labels,Queue* cpu_instructions){
       char * arg2=TOKEN_TYPE_STRINGS[s->arg2];
       printf("(%s)0x%02X %s(%s),%s(%s)\n",i->operation->string,s->opcode,arg1,i->arg1->string,arg2,i->arg2->string);
       CPU_INSTRUCTION* cpu_instruction=(CPU_INSTRUCTION*)malloc(sizeof(CPU_INSTRUCTION)); 
-      
+      cpu_instruction->arrgument.arg=0x0000;
+      cpu_instruction->OPCODE=s->opcode;
+
      
-      if(s->option=CONDITION){
+      if(s->option==CONDITION){
         if(strcmp(Memoric->string,"je")==0){
            cpu_instruction->extended_OP=IF_EQUAL;
         }else
@@ -352,11 +354,14 @@ void writeBinFIle(Queue* cpu_instructions,char* binfileLocation){
    
    while(!QueueIsEmpty(cpu_instructions)){
       CPU_INSTRUCTION* instruction=(CPU_INSTRUCTION*)deQueue(cpu_instructions);
-      uint16_t word1=instruction->OPCODE << 8| instruction->extended_OP;
-      uint16_t word2=instruction->arrgument.arg;
+      uint8_t byte1=instruction->OPCODE;
+      uint8_t byte2=instruction->extended_OP;
+      uint8_t byte3=instruction->arrgument.a;
+      uint8_t byte4=instruction->arrgument.b;
+      
       
       free(instruction);
-      fprintf(BIN_FILE," %04x%04x",word1,word2);
+      fprintf(BIN_FILE," %02x%02x%02x%02x",byte1,byte2,byte3,byte4);
    }
 }
    fclose(BIN_FILE);

@@ -1,30 +1,35 @@
 #include "headers/Syntax.h"
 #include <string.h>
 #include "headers/CAT.h"
-#define AMOUNT_OF_KEY_WORDS 4
+#define AMOUNT_OF_KEY_WORDS 5
+#define AMOUNT_OF_JE_RULES  2
 #define AMOUNT_OF_MOV_RULES 5
 #define AMOUNT_OF_ADD_RULES 1
-#define AMOUNt_OF_JMP_RULES 1
+#define AMOUNt_OF_JMP_RULES 2
 #define AMOUNT_OF_POP_RULES 1
 
 
 SYNTAX move_rules[AMOUNT_OF_MOV_RULES]={
-    {REGISTER,NUMBER,0x02,REG,(uint16_t)1},
-    {REGISTER,REGISTER,0x03,REG,(uint16_t)1},
-    {POINTER,REGISTER,0x04,REG,(uint16_t)1},
-    {POINTER,NUMBER,0x05,GET_NEXT_ARG_FROM_RAM,(uint16_t)2},
-    {POINTER,POINTER,0x05,GET_NEXT_ARG_FROM_RAM,(uint16_t)2}
+    {REGISTER,NUMBER,0x02,REG,1},
+    {REGISTER,REGISTER,0x03,REG,1},
+    {POINTER,REGISTER,0x04,REG,1},
+    {POINTER,NUMBER,0x05,GET_NEXT_ARG_FROM_RAM,2},
+    {POINTER,POINTER,0x05,GET_NEXT_ARG_FROM_RAM,2}
 };
 SYNTAX add_rules[AMOUNT_OF_ADD_RULES]={
-    {REGISTER,NUMBER,0x72,REG,(uint16_t)1},
+    {REGISTER,NUMBER,0x72,REG,1},
 };
 SYNTAX pop_rules[AMOUNT_OF_POP_RULES]={
-    {REGISTER,NO,0x90,REG,(uint16_t)1}
+    {REGISTER,NO,0x90,REG,1}
 };
 
 SYNTAX jmp_rules[AMOUNt_OF_JMP_RULES]={
-    {LABEL,NO,0x80,NONE,(uint16_t)1},
-
+    {LABEL,NO,0x80,NONE,1},
+    {POINTER,NO,0x80,NONE,1},
+};
+SYNTAX je_rules[AMOUNT_OF_JE_RULES]={
+    {LABEL,NO,0x80,CONDITION,1},
+    {POINTER,NO,0x80,CONDITION,1},
 };
 
 RULES move={
@@ -48,11 +53,17 @@ RULES pop={
 
 };
 
+RULES je={
+      je_rules,
+      AMOUNT_OF_JE_RULES
+
+};
 
 Node KeyWords[AMOUNT_OF_KEY_WORDS]={
        {"mov",false,&move},
        {"add",false,&add},
        {"jmp",false,&jmp},
+       {"je",false,&je},
        {"pop",false,&pop},
 };
 
