@@ -1,3 +1,4 @@
+mov [a],[b] ;mov 10 into register A
 @start
-
-jmp @s
+mov &a,&b ;mov 10 into register A
+jmp @start

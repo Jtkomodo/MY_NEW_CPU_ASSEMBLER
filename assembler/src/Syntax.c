@@ -1,21 +1,29 @@
 #include "headers/Syntax.h"
 #include <string.h>
 #include "headers/CAT.h"
-#define AMOUNT_OF_KEY_WORDS 3
-#define AMOUNT_OF_MOV_RULES 4
+#define AMOUNT_OF_KEY_WORDS 4
+#define AMOUNT_OF_MOV_RULES 5
 #define AMOUNT_OF_ADD_RULES 1
-#define AMOUNR_OF_JMP_RULES 1
+#define AMOUNt_OF_JMP_RULES 1
+#define AMOUNT_OF_POP_RULES 1
+
+
 SYNTAX move_rules[AMOUNT_OF_MOV_RULES]={
-    {REGISTER,NUMBER,0x02},
-    {REGISTER,REGISTER,0x03},
-    {POINTER,REGISTER,0x04},
-    {POINTER,NUMBER,0x05}
+    {REGISTER,NUMBER,0x02,REG,(uint16_t)1},
+    {REGISTER,REGISTER,0x03,REG,(uint16_t)1},
+    {POINTER,REGISTER,0x04,REG,(uint16_t)1},
+    {POINTER,NUMBER,0x05,GET_NEXT_ARG_FROM_RAM,(uint16_t)2},
+    {POINTER,POINTER,0x05,GET_NEXT_ARG_FROM_RAM,(uint16_t)2}
 };
 SYNTAX add_rules[AMOUNT_OF_ADD_RULES]={
-    {REGISTER,NUMBER,0x72},
+    {REGISTER,NUMBER,0x72,REG,(uint16_t)1},
 };
-SYNTAX jmp_rules[AMOUNR_OF_JMP_RULES]={
-    {LABEL,NO,0x80},
+SYNTAX pop_rules[AMOUNT_OF_POP_RULES]={
+    {REGISTER,NO,0x90,REG,(uint16_t)1}
+};
+
+SYNTAX jmp_rules[AMOUNt_OF_JMP_RULES]={
+    {LABEL,NO,0x80,NONE,(uint16_t)1},
 
 };
 
@@ -30,7 +38,13 @@ RULES add={
 };
 RULES jmp={
       jmp_rules,
-      AMOUNR_OF_JMP_RULES
+      AMOUNt_OF_JMP_RULES
+
+};
+
+RULES pop={
+      pop_rules,
+      AMOUNt_OF_JMP_RULES
 
 };
 
@@ -39,7 +53,7 @@ Node KeyWords[AMOUNT_OF_KEY_WORDS]={
        {"mov",false,&move},
        {"add",false,&add},
        {"jmp",false,&jmp},
-
+       {"pop",false,&pop},
 };
 
 HashMap h;
@@ -67,7 +81,12 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
             SYNTAX* s=&(rules->syntaxRules[i]);
              if(s!=NULL){
                 if((s->arg1==a)&&(s->arg2==b)){
-                   syntax=s;
+                  syntax=malloc(sizeof(SYNTAX)*rules->amountOfRules);
+                   syntax->arg1=s->arg1;
+                   syntax->arg2=s->arg2;
+                   syntax->opcode=s->opcode;
+                   syntax->option=s->option;
+                   syntax->size=s->size;
                 break;
                 }
              }

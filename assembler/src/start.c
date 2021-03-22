@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "headers/Instruction.h"
+#include "headers/Token.h"
 #include "headers/hashMap.h"
 #include "headers/Queue.h"
 #include "headers/Error.h"
 #include "headers/Syntax.h"
 #include "headers/CAT.h"
+#include "headers/CPU.h"
 
 #define ERROR_TO_MANY_ARGS 0x4
 #define ERROR_TO_FEW_ARGS 0x6
 #define ERROR_FILE_NOT_FOUND 0x404
-
+char* DEFAULTbinfileName="D:\\VsProject\\MY_NEW_CPU_ASSEMBLER\\assembler\\program.bin";
 
 typedef struct Label_entry{
     char* string;
@@ -19,42 +20,55 @@ typedef struct Label_entry{
 } Label_entry;
 
 int firstPass(Queue* instructions,HashMap* h,FILE *file);
-CPU_INSTRUCTION* secondPass(Queue* instructions);
-void writeFIle();
+int secondPass(Queue* instruction,HashMap* labels,Queue* cpu_instructions);
+void writeBinFIle(Queue* cpu_instructions,char* binfileLocation);
 int CheckIfProgramShouldRun(int argc,char *atgv[]);
-TOKEN getToken(const char* arg);
 
 int main(int argc, char *argv[]){
    int ERROR_CODE=CheckIfProgramShouldRun(argc,argv);
    if(ERROR_CODE!=0){
         return ERROR_CODE;
     }
- HashMap h=*init(100,hash);
- Queue q=*initQueue();
+    
+ HashMap labels=*init(100,hash);
+ Queue instuctions=*initQueue();
+ Queue cpu_instuctions=*initQueue();
  
- char* file=argv[1];
- 
-  FILE *filePointer;
-   filePointer= fopen(file,"r");
-   if(filePointer==NULL){
+ char* asmfile=argv[1];
+ char * binfile;
+ if(argc>2){
+     binfile=argv[2];  
+ }else{
+    binfile=DEFAULTbinfileName;
+ }
+  FILE * ASM_FILE;
+    ASM_FILE= fopen(asmfile,"r");
+   if(ASM_FILE==NULL){
      printf("[ERROR] FILE NOT FOUD");
       exit(EXIT_FAILURE);
    }
 
    initSyntax();
-  firstPass(&q,&h,filePointer);
-  secondPass(&q);
-  fclose(filePointer);
+  int errors; 
+  errors=firstPass(&instuctions,&labels,ASM_FILE);
+  if(errors==0){
+  errors=secondPass(&instuctions,&labels,&cpu_instuctions);
+  }
+  if(errors==0){
+    writeBinFIle(&cpu_instuctions,binfile);
+  }
+  fclose(ASM_FILE);
 
 
   freeSyntax();
-  freeQueue(&q);
-  freeMap(&h);
+  freeQueue(&instuctions);
+  freeQueue(&cpu_instuctions);
+  freeMap(&labels);
   exit(0);
 }
 
 int CheckIfProgramShouldRun(int argc,char *atgv[]){
-      if(argc>2){
+      if(argc>3){
         return ERROR_TO_MANY_ARGS;
       }else if(argc<2){
         return ERROR_TO_FEW_ARGS;
@@ -71,6 +85,7 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
    int errors=0;
   Queue labelsDefinedLater=*initQueue();
   Queue errorList=*initQueue();
+  Queue* p=&errorList;
   int line=0;
   Pointer MEMLOCATION=0x00;
   char command[60];
@@ -81,9 +96,18 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
    memoric=strtok(memoric,"\n");
    char* Ins=strtok(memoric," ");
    char* arg1=strtok(NULL,",");
-   char* arg2=strtok(NULL," ");
+   char* arg2=strtok(NULL," ,");
+   char* arg3=strtok(NULL," ,");
   if(Ins!=NULL){
-     printf("%s,%s,%s;\n",Ins,arg1,arg2);
+     if(arg3!=NULL){
+       ERROR* e=(ERROR*)malloc(sizeof(ERROR));
+        e->errorMessage=(char*)malloc(sizeof(char)*36);
+        strcpy(e->errorMessage,"To many arguments ony 2 are allowed");
+        e->lineNumber=line;
+        enQueue(&errorList,e,true);
+        continue;
+     }
+     printf("%i--%s,%s,%s;\n",line,Ins,arg1,arg2);
 
 
 
@@ -101,14 +125,40 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
           continue;
        }
        
-        Pointer m=*(Pointer*)malloc(sizeof(Pointer));
-        m=MEMLOCATION;
-        addNode(h,memoric,&m,true);
+        Pointer* m=(Pointer*)malloc(sizeof(Pointer));
+        *m=MEMLOCATION;
+        if(!hasKey(h,memoric)){
+          addNode(h,memoric,m,true);
+        }else{
+          
+          char* Label="Label \"";
+          char* already="\" already defined at memory location 0x";
+          int* value;
+          getValue(h,memoric,&value);
+          size_t size=sizeof(char)*sizeof(Pointer)+1;
+          char* lineNumber=(char*)malloc(size);
+          itoa(*(Pointer*)value,lineNumber,16);
+          size_t i=strlen(Label)+strlen(memoric)+strlen(already)+strlen(lineNumber)+1;
+           ERROR* e=(ERROR*)malloc(sizeof(ERROR));
+          e->errorMessage=(char*)malloc(i);
+          char* strings[4]={
+            Label,
+            memoric,
+            already,
+            lineNumber
+          };
+
+         
+         CAT(e->errorMessage,strings,4);
+          e->lineNumber=line;
+          enQueue(&errorList,e,true);
+          free(lineNumber);
+        }
         continue;
    }else{
       ERROR* e=malloc(sizeof(ERROR));
       ERROR* e2=malloc(sizeof(ERROR));
-      TOKEN a=parseToToken(arg1,e);
+      TOKEN* a=parseToToken(arg1,e);
        if(e->errorMessage!=NULL){
             e->lineNumber=line;
             enQueue(&errorList,e,true);
@@ -118,7 +168,7 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
         }
      
 
-      TOKEN b=parseToToken(arg2,e2);
+      TOKEN* b=parseToToken(arg2,e2);
        if(e2->errorMessage!=NULL){
             e2->lineNumber=line;
             enQueue(&errorList,e2,true);
@@ -128,31 +178,37 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
        }
 
       ERROR* e3=malloc(sizeof(ERROR));
-       if(checkSyntax(Ins,a.type,b.type,e3)!=NULL){
+       SYNTAX* s=checkSyntax(Ins,a->type,b->type,e3);
+       if(s!=NULL){
           free(e3);
-          Instruction i=*(Instruction*)malloc(sizeof(Instruction));
-           TOKEN t;
-           t.string=Ins;
-           t.type=MEMORIC;
+          Instruction* i=(Instruction*)malloc(sizeof(Instruction));
+           TOKEN* t=(TOKEN*)malloc(sizeof(TOKEN));
+           t->string=malloc(strlen(Ins)+1);
+           strcpy(t->string,Ins);
+           t->type=MEMORIC;
           
-            i.operation=t;
-            i.arg1=a;
-            i.arg2=b;
-        if(a.type==LABEL){
-          if(!hasKey(h,a.string)){
+            i->operation=t;
+            i->arg1=a;
+            i->arg2=b;
+            i->syntax=s;
+            Pointer p=s->size;
+            MEMLOCATION+=p;
+           
+        if(a->type==LABEL){
+          if(!hasKey(h,a->string)){
            Label_entry l=*(Label_entry*)malloc(sizeof(Label_entry));
-           l.string=malloc(sizeof(a.string));
-           strcpy(l.string,a.string);
+           l.string=malloc(sizeof(a->string));
+           strcpy(l.string,a->string);
            l.lineNumber=line; 
            enQueue(&labelsDefinedLater,&l,true);
            continue;
           }
         }
-        if(b.type==LABEL){
-           if(!hasKey(h,b.string)){
+        if(b->type==LABEL){
+           if(!hasKey(h,b->string)){
             Label_entry l=*(Label_entry*)malloc(sizeof(Label_entry));
-            l.string=malloc(sizeof(b.string));
-            strcpy(l.string,b.string);
+            l.string=malloc(sizeof(b->string));
+            strcpy(l.string,b->string);
             l.lineNumber=line; 
             enQueue(&labelsDefinedLater,&l,true);
             continue;
@@ -161,7 +217,7 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
 
 
 
-           enQueue(instructions,&i,true);
+           enQueue(instructions,i,true);
         
        }else{
         e3->lineNumber=line;
@@ -181,7 +237,7 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
 
 
 
-   MEMLOCATION++;
+  
    }}
 
 
@@ -226,26 +282,82 @@ while(!QueueIsEmpty(&errorList)){
     }
       
 }
-printf("ERRORS %i",errors);
+printf("ERRORS %i\n",errors);
 
 freeQueue(&labelsDefinedLater);
-freeQueue(&errorList);
+freeQueue(p);
 return errors;
 }
-TOKEN getToken(const char* arg){
+int secondPass(Queue* instructions,HashMap* labels,Queue* cpu_instructions){
+   int errors=0;
+   while(!QueueIsEmpty(instructions)){
+      Instruction* i=(Instruction*)deQueue(instructions);
+      
+      TOKEN* Memoric=i->operation;
+      TOKEN* ARG1=i->arg1;
+      TOKEN* ARG2=i->arg2;
+      SYNTAX* s=i->syntax;
 
-  
-}
 
-CPU_INSTRUCTION* secondPass(Queue* instructions){
- 
+
+      char* arg1=TOKEN_TYPE_STRINGS[s->arg1];
+      char * arg2=TOKEN_TYPE_STRINGS[s->arg2];
+      printf("(%s)0x%02X %s(%s),%s(%s)\n",i->operation->string,s->opcode,arg1,i->arg1->string,arg2,i->arg2->string);
+      CPU_INSTRUCTION* cpu_instruction=(CPU_INSTRUCTION*)malloc(sizeof(CPU_INSTRUCTION)); 
+      
+     
+      if(s->option=CONDITION){
+        if(strcmp(Memoric->string,"je")==0){
+           cpu_instruction->extended_OP=IF_EQUAL;
+        }else
+        if(strcmp(Memoric->string,"jg")==0){
+           cpu_instruction->extended_OP=IF_GREATOR;
+        }else
+         if(strcmp(Memoric->string,"jl")==0){
+           cpu_instruction->extended_OP=IF_LESS;
+        }
+      }else{
+         cpu_instruction->extended_OP=0x00;
+         cpu_instruction->argument2.arg=0x00;
+      } 
+    
+      enQueue(cpu_instructions,cpu_instruction,true);
+   
+      
+      free(i->arg1->string);
+      free(i->arg1);
+      free(i->arg2->string);
+      free(i->arg2);
+      free(i->operation->string);
+      free(i->operation);
+      free(i->syntax);
+      free(i);
+   
+     
+   }
+
+return errors;
+
    
 
 
 
-   
-
-
-
 }
-
+void writeBinFIle(Queue* cpu_instructions,char* binfileLocation){
+   FILE* BIN_FILE;
+      BIN_FILE= fopen(binfileLocation,"w");
+   if(BIN_FILE==NULL){
+     printf("[ERROR] FILE NOT WRITTEN");
+   }else{
+   
+   while(!QueueIsEmpty(cpu_instructions)){
+      CPU_INSTRUCTION* instruction=(CPU_INSTRUCTION*)deQueue(cpu_instructions);
+      uint16_t word1=instruction->OPCODE << 8| instruction->extended_OP;
+      uint16_t word2=instruction->arrgument.arg;
+      
+      free(instruction);
+      fprintf(BIN_FILE," %04x%04x",word1,word2);
+   }
+}
+   fclose(BIN_FILE);
+}
