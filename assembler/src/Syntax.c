@@ -1,6 +1,7 @@
 #include "headers/Syntax.h"
 #include <string.h>
 #include "headers/CAT.h"
+#include "headers/CPU.h"
 #define AMOUNT_OF_KEY_WORDS 5
 #define AMOUNT_OF_JE_RULES  2
 #define AMOUNT_OF_MOV_RULES 5
@@ -8,28 +9,31 @@
 #define AMOUNt_OF_JMP_RULES 2
 #define AMOUNT_OF_POP_RULES 1
 
+//opcodes for instructions
+
 
 SYNTAX move_rules[AMOUNT_OF_MOV_RULES]={
-    {REGISTER,NUMBER,0x02,REG,1},
-    {REGISTER,REGISTER,0x03,REG,1},
-    {POINTER,REGISTER,0x04,REG,1},
-    {POINTER,NUMBER,0x05,GET_NEXT_ARG_FROM_RAM,2},
-    {POINTER,POINTER,0x05,GET_NEXT_ARG_FROM_RAM,2}
+    {REGISTER,NUMBER,OP_MOV_R_N,REG,1},
+    {REGISTER,REGISTER,OP_MOV_R_R,REG,1},
+    {POINTER,REGISTER,OP_MOVE_P_R,REG,1},
+    {POINTER,NUMBER,OP_MOVE_P_N,GET_NEXT_ARG_FROM_RAM,2},
+  
 };
 SYNTAX add_rules[AMOUNT_OF_ADD_RULES]={
-    {REGISTER,NUMBER,0x72,REG,1},
+    {REGISTER,NUMBER,OP_ADD,REG,1},
+
 };
 SYNTAX pop_rules[AMOUNT_OF_POP_RULES]={
-    {REGISTER,NO,0x90,REG,1}
+    {REGISTER,NO,OP_POP,REG,1}
 };
 
 SYNTAX jmp_rules[AMOUNt_OF_JMP_RULES]={
-    {LABEL,NO,0x80,NONE,1},
-    {POINTER,NO,0x80,NONE,1},
+    {LABEL,NO,OP_JMP,NONE,1},
+    {POINTER,NO,OP_JMP,NONE,1},
 };
 SYNTAX je_rules[AMOUNT_OF_JE_RULES]={
-    {LABEL,NO,0x80,CONDITION,1},
-    {POINTER,NO,0x80,CONDITION,1},
+    {LABEL,NO,OP_JMP,CONDITION,1},
+    {POINTER,NO,OP_JMP,CONDITION,1},
 };
 
 RULES move={
@@ -92,12 +96,13 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
             SYNTAX* s=&(rules->syntaxRules[i]);
              if(s!=NULL){
                 if((s->arg1==a)&&(s->arg2==b)){
-                  syntax=malloc(sizeof(SYNTAX)*rules->amountOfRules);
+                   syntax=malloc(sizeof(SYNTAX)*rules->amountOfRules);
                    syntax->arg1=s->arg1;
                    syntax->arg2=s->arg2;
                    syntax->opcode=s->opcode;
                    syntax->option=s->option;
                    syntax->size=s->size;
+                
                 break;
                 }
              }
@@ -124,7 +129,7 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
          }
         
       }else{
-        char* Memoric="Memoric \"";
+        char* Memoric="MemoriF \"";
         char* not_found="\" does not exist";
         size_t i=strlen(syntax_error)+strlen(Memoric)+strlen(keyword)+strlen(not_found)+1;
         error->errorMessage=(char*)malloc(i);

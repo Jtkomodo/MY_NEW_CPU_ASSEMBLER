@@ -7,6 +7,8 @@
     "configurations": [
         
 
+        
+
         {
             
             "name": "(gdb) Launch",
@@ -15,7 +17,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/start.exe",
             
-            "args": ["${workspaceFolder}/program.asm","${workspaceFolder}/BIN/program.bin"],
+            "args": ["${workspaceFolder}/*.asm","${workspaceFolder}/BIN/program.bin"],
             "stopAtEntry": false,
             "externalConsole": true,
             "cwd": "${workspaceFolder}",

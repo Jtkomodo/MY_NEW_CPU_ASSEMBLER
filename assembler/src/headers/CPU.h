@@ -14,6 +14,14 @@
 //check if zero flag is off option=1010 0000
 //check if carry and overflow is off=1000 
 
+#define OP_MOV_R_N 0x03
+#define OP_MOV_R_R 0x04
+#define OP_MOVE_P_R 0x05
+#define OP_MOVE_P_N 0x06
+#define OP_ADD 0x72
+#define OP_POP 0x90
+#define OP_JMP 0x80
+
 
 #define IF_EQUAL      0x70//11 10 0000 zf=on
 #define IF_ NOT_EQUAL 0xa0//10 10 0000 zf=off
@@ -28,7 +36,6 @@ typedef enum REGISTERS{
      A,
      B,
      EAX,
-     XY,
      SP,
      BP
 } REGISTERS;
@@ -53,7 +60,6 @@ typedef struct CPU_INSTRUCTION
       uint8_t OPCODE;
       uint8_t extended_OP;
       CPU_ARG arrgument;
-      CPU_ARG argument2;
 } CPU_INSTRUCTION;
 
 #endif

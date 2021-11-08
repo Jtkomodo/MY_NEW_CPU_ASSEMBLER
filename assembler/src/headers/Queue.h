@@ -4,7 +4,7 @@
 
 typedef struct Q_NODE{
     struct Q_NODE* next;
-     void* value;
+    void* value;
     bool dynamic_ptr; 
     
 }Q_NODE;

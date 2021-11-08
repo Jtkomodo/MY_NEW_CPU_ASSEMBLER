@@ -10,7 +10,7 @@
 				"${workspaceFolder}/src/headers/*.h",
 				"${workspaceFolder}/src/*.c",
 				"-o",
-				"${workspaceFolder}\\start.exe"
+				"${workspaceFolder}\\ASM.exe"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

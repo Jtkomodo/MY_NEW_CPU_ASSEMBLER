@@ -129,6 +129,8 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
         *m=MEMLOCATION;
         if(!hasKey(h,memoric)){
           addNode(h,memoric,m,true);
+          printf("Label %s defined with memmory location 0x%X\n",memoric,*m);
+
         }else{
           
           char* Label="Label \"";
@@ -288,6 +290,9 @@ freeQueue(&labelsDefinedLater);
 freeQueue(p);
 return errors;
 }
+
+
+
 int secondPass(Queue* instructions,HashMap* labels,Queue* cpu_instructions){
    int errors=0;
    while(!QueueIsEmpty(instructions)){
@@ -320,8 +325,42 @@ int secondPass(Queue* instructions,HashMap* labels,Queue* cpu_instructions){
         }
       }else{
          cpu_instruction->extended_OP=0x00;
-         cpu_instruction->argument2.arg=0x00;
       } 
+      printf("aType=%d bType=%d\n",s->arg1,s->arg2);
+      if(s->arg1==NUMBER){
+         char* numberToParse=i->arg1->string;
+         if(numberToParse!=NULL){
+            if(strstr(numberToParse,"0x")==numberToParse){
+             int a=strtol(numberToParse,NULL,16);
+             cpu_instruction->arrgument.a=a;
+            }else{
+                int a=atoi(numberToParse);
+                cpu_instruction->arrgument.a=a;
+            }
+             
+         }
+
+
+      }
+      if(s->arg2==NUMBER){
+         char* numberToParse=i->arg2->string;
+         if(numberToParse!=NULL){
+          if(strstr(numberToParse,"0x")==numberToParse){
+             int b=strtol(numberToParse,NULL,16);
+             cpu_instruction->arrgument.b=b;
+            }else{
+                int b=atoi(numberToParse);
+                cpu_instruction->arrgument.b=b;
+            }
+         }
+
+
+      }
+      
+
+
+
+
     
       enQueue(cpu_instructions,cpu_instruction,true);
    
