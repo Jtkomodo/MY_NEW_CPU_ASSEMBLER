@@ -92,7 +92,7 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
       RULES* rules;
       getValue(&h,keyword,(void**)&rules);
       if(rules!=NULL){
-         for(int i=0;i<rules->amountOfRules;i++){
+         for(int i=0;i<rules->amountOfRules-1;i++){
             SYNTAX* s=&(rules->syntaxRules[i]);
              if(s!=NULL){
                 if((s->arg1==a)&&(s->arg2==b)){
@@ -102,7 +102,6 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
                    syntax->opcode=s->opcode;
                    syntax->option=s->option;
                    syntax->size=s->size;
-                
                 break;
                 }
              }
@@ -129,7 +128,7 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
          }
         
       }else{
-        char* Memoric="MemoriF \"";
+        char* Memoric="Memoric \"";
         char* not_found="\" does not exist";
         size_t i=strlen(syntax_error)+strlen(Memoric)+strlen(keyword)+strlen(not_found)+1;
         error->errorMessage=(char*)malloc(i);

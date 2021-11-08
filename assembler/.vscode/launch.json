@@ -5,7 +5,7 @@
     "version": "0.2.0",
     
     "configurations": [
-        
+
 
         
 
@@ -15,7 +15,7 @@
             "type": "cppdbg",
              "preLaunchTask": "build",
             "request": "launch",
-            "program": "${workspaceFolder}/start.exe",
+            "program": "${workspaceFolder}/ASM.exe",
             
             "args": ["${workspaceFolder}/*.asm","${workspaceFolder}/BIN/program.bin"],
             "stopAtEntry": false,
