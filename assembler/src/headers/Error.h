@@ -4,4 +4,8 @@ typedef struct ERROR{
      char* errorMessage;
      int lineNumber;
 } ERROR;
+
+
+
+
 #endif

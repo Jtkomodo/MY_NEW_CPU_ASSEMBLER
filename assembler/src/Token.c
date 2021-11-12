@@ -4,6 +4,8 @@
 #include "headers/Error.h"
 #include "headers/Error.h"
 #include "headers/CAT.h"
+#include "headers/hashMap.h"
+#include "headers/CPU.h"
 
 char* TOKEN_TYPE_STRINGS[]={
        "NO",
@@ -15,6 +17,42 @@ char* TOKEN_TYPE_STRINGS[]={
 
 
 };
+
+static int intReg[NUMBER_OF_REGISTERS]={
+     r0,
+     r1,
+     r2,
+     r3,
+     A,
+     B,
+     EAX,
+     SP,
+     BP
+};
+static Entry REG_NODES[NUMBER_OF_REGISTERS]={
+      {"&ro",false,&intReg[0]},
+      {"&r1",false,&intReg[1]},
+      {"&r2",false,&intReg[2]},
+      {"&r3",false,&intReg[3]},
+      {"&a",false,&intReg[4]},
+      {"&b",false,&intReg[5]},
+      {"&eax",false,&intReg[6]},
+      {"&sp",false,&intReg[7]},
+      {"&bp",false,&intReg[8]}
+
+};
+
+
+HashMap MAP_REG;
+void InitTokens(){
+     MAP_REG=*init(NUMBER_OF_REGISTERS*2,hash);
+     addNodes(&MAP_REG,REG_NODES,NUMBER_OF_REGISTERS);
+}
+void freeTokens(){
+    freeMap(&MAP_REG);
+}
+
+
 
 TOKEN* parseToToken(char* string,ERROR* error){
      TOKEN* t=(TOKEN*)malloc(sizeof(TOKEN));
@@ -43,6 +81,25 @@ TOKEN* parseToToken(char* string,ERROR* error){
          t->string=malloc(strlen(string)+1);
          strcpy(t->string,string);
          t->type=REGISTER;
+         bool registerExist=hasKey(&MAP_REG,string);
+         if(!registerExist){
+            char* no="no such register \"";
+            char* exist="\"exist!";
+            int i=strlen(no)+strlen(exist)+strlen(string)+1;
+            error->errorMessage=(char*)malloc(i);
+            char* strings[3]={
+                no,
+                string,
+                exist
+            };
+            CAT(error->errorMessage,strings,3);
+            errors=true;
+         }else{
+            printf("register %s",string);
+         }
+         
+
+
      }else if(strstr(string,HEX_MARKER)==string){
            char* end; 
             strtol(string,&end,0);
@@ -52,7 +109,7 @@ TOKEN* parseToToken(char* string,ERROR* error){
              int i=strlen(hex)+strlen(string)+strlen(not_real)+1;
              error->errorMessage=(char*)malloc(i);
              char* strings[3]={
-                   hex,
+                  hex,
                   string,
                   not_real
              };
@@ -94,7 +151,7 @@ TOKEN* parseToToken(char* string,ERROR* error){
              errors=true;
           }
          t->string=malloc(strlen(string)+1);
-             strcpy(t->string,string);
+         strcpy(t->string,string);
           t->type=NUMBER; 
 
 

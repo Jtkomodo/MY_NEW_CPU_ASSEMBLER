@@ -55,6 +55,9 @@ bool enQueue(Queue* queue,void* value,bool dynamic_ptr){
       succsess=true;
     }
   }
+  if(succsess){
+    queue->size++;
+  }
   return succsess;
 }
 
@@ -66,25 +69,40 @@ bool enQueue(Queue* queue,void* value,bool dynamic_ptr){
 void* deQueue(Queue* queue){
    void* value=NULL;
     if(queue->head==NULL || queue->tail==NULL){//if queue is empty
-    
+       queue->size=0;
        printf("[QUEUE]queue is empty\n");
     }else{//if queue is not empty make the node the head points to be the new head
        Q_NODE* oldhead=queue->head;//head
        value=oldhead->value;
        if(oldhead->next!=NULL){//if the head was not the only value in the queue
            queue->head=oldhead->next;
-     }else{//else make the queue's tail and head point to null
+      }else{//else make the queue's tail and head point to null
+           queue->size=0;
            queue->head=NULL;
            queue->tail=NULL;
        }
       free(oldhead);
+      queue->size--;
     //  printf("[QUEUE]value removed and node freed\n");
     }
    return value;
 
 }
 
-
+void* getValueAtIndex(Queue* q,int index){
+    void* value=NULL;
+    if(index<(q->size)){
+      int i=0;
+      Q_NODE* n=q->head;
+      while (i<index)
+      {
+        n=n->next;
+        i++;
+      }
+      value=n->value;
+    }
+    return value;
+}
 
 bool QueueIsEmpty(Queue* queue){
     return (queue->head==NULL)||(queue->tail==NULL);
@@ -95,6 +113,7 @@ Queue* initQueue(){
         if(q!=NULL){
             q->head=NULL;
             q->tail=NULL;
+            q->size=0;
         }
 
 }

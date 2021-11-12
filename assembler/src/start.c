@@ -13,12 +13,16 @@
 #define ERROR_TO_FEW_ARGS 0x6
 #define ERROR_FILE_NOT_FOUND 0x404
 char* DEFAULTbinfileName="D:\\VsProject\\MY_NEW_CPU_ASSEMBLER\\assembler\\program.bin";
-
 typedef struct Label_entry{
     char* string;
     int lineNumber;
 } Label_entry;
 
+
+
+
+void inits();
+void frees();
 int firstPass(Queue* instructions,HashMap* h,FILE *file);
 int secondPass(Queue* instruction,HashMap* labels,Queue* cpu_instructions);
 void writeBinFIle(Queue* cpu_instructions,char* binfileLocation);
@@ -33,11 +37,12 @@ int main(int argc, char *argv[]){
  HashMap labels=*init(100,hash);
  Queue instuctions=*initQueue();
  Queue cpu_instuctions=*initQueue();
+ inits();
  
  char* asmfile=argv[1];
  char * binfile;
  if(argc>2){
-     binfile=argv[2];  
+    binfile=argv[2];  
  }else{
     binfile=DEFAULTbinfileName;
  }
@@ -47,8 +52,6 @@ int main(int argc, char *argv[]){
      printf("[ERROR] FILE NOT FOUD");
       exit(EXIT_FAILURE);
    }
-
-   initSyntax();
   int errors; 
   errors=firstPass(&instuctions,&labels,ASM_FILE);
   if(errors==0){
@@ -60,7 +63,7 @@ int main(int argc, char *argv[]){
   fclose(ASM_FILE);
 
 
-  freeSyntax();
+  frees();
   freeQueue(&instuctions);
   freeQueue(&cpu_instuctions);
   freeMap(&labels);
@@ -76,11 +79,20 @@ int CheckIfProgramShouldRun(int argc,char *atgv[]){
     
     return 0;
 }
+void frees(){
+  freeSyntax();
+  freeTokens();  
+}
 
+void inits(){
+    InitTokens();
+    initSyntax();
 
+}
 
 
 int firstPass(Queue* instructions,HashMap* h,FILE *file){
+  
 //this is where we will get all the tokens and replace labels with the correct memory location
    int errors=0;
   Queue labelsDefinedLater=*initQueue();
@@ -136,7 +148,7 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
           char* Label="Label \"";
           char* already="\" already defined at memory location 0x";
           int* value;
-          getValue(h,memoric,&value);
+          getValue(h,memoric,(void**)&value);
           size_t size=sizeof(char)*sizeof(Pointer)+1;
           char* lineNumber=(char*)malloc(size);
           itoa(*(Pointer*)value,lineNumber,16);
@@ -269,7 +281,7 @@ while(!QueueIsEmpty(&labelsDefinedLater)){
        enQueue(&errorList,e,true);
      
     }
-   free(label->string);
+  // free(label->string);
    free(label); 
 }
 
@@ -352,10 +364,18 @@ int secondPass(Queue* instructions,HashMap* labels,Queue* cpu_instructions){
                 int b=atoi(numberToParse);
                 cpu_instruction->arrgument.b=b;
             }
-         }
-
+       }
+    
 
       }
+        if(s->arg1==LABEL){
+         char* labeltogetMemLocation=i->arg1->string;
+         Pointer* m;
+         getValue(labels,labeltogetMemLocation,(void**)&m);
+         printf("LABEL %s changed to memory location 0x%X",labeltogetMemLocation,*m);
+         cpu_instruction->arrgument.arg=*m;
+      }
+      
       
 
 

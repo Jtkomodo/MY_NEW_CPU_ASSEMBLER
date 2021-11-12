@@ -5,6 +5,7 @@
     "version": "0.2.0",
     
     "configurations": [
+        
 
 
         
@@ -17,7 +18,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/ASM.exe",
             
-            "args": ["${workspaceFolder}/*.asm","${workspaceFolder}/BIN/program.bin"],
+            "args": ["${workspaceFolder}/*.asm"],
             "stopAtEntry": false,
             "externalConsole": true,
             "cwd": "${workspaceFolder}",

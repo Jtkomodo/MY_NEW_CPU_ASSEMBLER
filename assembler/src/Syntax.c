@@ -9,61 +9,67 @@
 #define AMOUNt_OF_JMP_RULES 2
 #define AMOUNT_OF_POP_RULES 1
 
+
 //opcodes for instructions
 
 
-SYNTAX move_rules[AMOUNT_OF_MOV_RULES]={
+
+
+
+static  SYNTAX move_rules[AMOUNT_OF_MOV_RULES]={
     {REGISTER,NUMBER,OP_MOV_R_N,REG,1},
     {REGISTER,REGISTER,OP_MOV_R_R,REG,1},
     {POINTER,REGISTER,OP_MOVE_P_R,REG,1},
     {POINTER,NUMBER,OP_MOVE_P_N,GET_NEXT_ARG_FROM_RAM,2},
   
 };
-SYNTAX add_rules[AMOUNT_OF_ADD_RULES]={
+static  SYNTAX add_rules[AMOUNT_OF_ADD_RULES]={
     {REGISTER,NUMBER,OP_ADD,REG,1},
 
 };
-SYNTAX pop_rules[AMOUNT_OF_POP_RULES]={
+static  SYNTAX pop_rules[AMOUNT_OF_POP_RULES]={
     {REGISTER,NO,OP_POP,REG,1}
 };
 
-SYNTAX jmp_rules[AMOUNt_OF_JMP_RULES]={
+static  SYNTAX jmp_rules[AMOUNt_OF_JMP_RULES]={
     {LABEL,NO,OP_JMP,NONE,1},
     {POINTER,NO,OP_JMP,NONE,1},
 };
-SYNTAX je_rules[AMOUNT_OF_JE_RULES]={
+static  SYNTAX je_rules[AMOUNT_OF_JE_RULES]={
     {LABEL,NO,OP_JMP,CONDITION,1},
     {POINTER,NO,OP_JMP,CONDITION,1},
 };
 
-RULES move={
+static RULES move={
      move_rules,
      AMOUNT_OF_MOV_RULES
 };
 
-RULES add={
+static RULES add={
       add_rules,
       AMOUNT_OF_ADD_RULES
 };
-RULES jmp={
+static RULES jmp={
       jmp_rules,
       AMOUNt_OF_JMP_RULES
 
 };
 
-RULES pop={
+static RULES pop={
       pop_rules,
       AMOUNt_OF_JMP_RULES
 
 };
 
-RULES je={
+static RULES je={
       je_rules,
       AMOUNT_OF_JE_RULES
 
 };
 
-Node KeyWords[AMOUNT_OF_KEY_WORDS]={
+
+
+static  Entry KeyWords[AMOUNT_OF_KEY_WORDS]={
        {"mov",false,&move},
        {"add",false,&add},
        {"jmp",false,&jmp},
@@ -72,12 +78,15 @@ Node KeyWords[AMOUNT_OF_KEY_WORDS]={
 };
 
 HashMap h;
+
 void initSyntax(){
-    h=*init(AMOUNT_OF_KEY_WORDS+200,hash);
+    h=*init(AMOUNT_OF_KEY_WORDS*2,hash);
     addNodes(&h,KeyWords,AMOUNT_OF_KEY_WORDS);
+  
 }
 void freeSyntax(){
     freeMap(&h);
+    
 }
 
 
@@ -91,6 +100,7 @@ SYNTAX* checkSyntax(char* keyword,TOKEN_TYPE a,TOKEN_TYPE b,ERROR* error){
       SYNTAX* syntax=NULL;
       RULES* rules;
       getValue(&h,keyword,(void**)&rules);
+
       if(rules!=NULL){
          for(int i=0;i<rules->amountOfRules-1;i++){
             SYNTAX* s=&(rules->syntaxRules[i]);

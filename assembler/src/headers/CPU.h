@@ -14,6 +14,11 @@
 //check if zero flag is off option=1010 0000
 //check if carry and overflow is off=1000 
 
+#define IF_EQUAL      0x70//11 10 0000 zf=on
+#define IF_ NOT_EQUAL 0xa0//10 10 0000 zf=off
+#define IF_GREATOR    0xb0//10 11 0000 zf=off sign=off
+#define IF_LESS       0xd0//11 01 0000  sign=on 
+//OPCODES
 #define OP_MOV_R_N 0x03
 #define OP_MOV_R_R 0x04
 #define OP_MOVE_P_R 0x05
@@ -23,12 +28,9 @@
 #define OP_JMP 0x80
 
 
-#define IF_EQUAL      0x70//11 10 0000 zf=on
-#define IF_ NOT_EQUAL 0xa0//10 10 0000 zf=off
-#define IF_GREATOR    0xb0//10 11 0000 zf=off sign=off
-#define IF_LESS       0xd0//11 01 0000  sign=on 
+#define NUMBER_OF_REGISTERS 9
 
-typedef enum REGISTERS{
+typedef enum REG_ID{
      r0,
      r1,
      r2,
@@ -38,7 +40,9 @@ typedef enum REGISTERS{
      EAX,
      SP,
      BP
-} REGISTERS;
+} REG_ID;
+
+
 
 
 
@@ -47,8 +51,8 @@ typedef uint16_t Pointer;
 
 typedef union CPU_ARG{
       struct{
-          uint8_t a;
           uint8_t b;
+          uint8_t a;
 
       };
       uint16_t arg;

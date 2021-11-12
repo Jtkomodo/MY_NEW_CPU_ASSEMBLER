@@ -31,6 +31,9 @@ typedef struct SYNTAX
     OPTION_TYPE option;
     uint16_t size;
 } SYNTAX;
+
+
+
 //syntax for each memmoric
 typedef struct RULES{
     SYNTAX* syntaxRules;

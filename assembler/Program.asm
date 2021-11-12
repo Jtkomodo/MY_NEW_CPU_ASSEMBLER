@@ -1,5 +1,7 @@
-mov &b,10 ;mov 10 into register A
-@start
+mov &b,32 ;mov 10 into register A
 mov &a,&b ;mov 10 into register A
-pop
-jmp @start
+pop &a
+je @start
+@start
+
+

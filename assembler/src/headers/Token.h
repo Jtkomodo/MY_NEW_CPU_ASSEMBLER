@@ -29,7 +29,8 @@ typedef struct TOKEN{
 } TOKEN;
 
 
-
+void InitTokens();
+void freeTokens();
 TOKEN* parseToToken(char* string,ERROR* error);
 
 #endif

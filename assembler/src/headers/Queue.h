@@ -13,11 +13,14 @@ typedef struct Queue
 {
     Q_NODE* head;
     Q_NODE* tail;
+    int size;
 } Queue;
+
 
 void freeQueue(Queue* queue);
 bool enQueue(Queue* queue,void* value,bool dynamiic_ptr);
 void* deQueue(Queue* queue);
+void* getValueAtIndex(Queue* Queue,int index);
 Queue* initQueue();
 bool QueueIsEmpty(Queue* Queue);
 
