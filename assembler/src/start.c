@@ -215,7 +215,7 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
            strcpy(l.string,a->string);
            l.lineNumber=line; 
            enQueue(&labelsDefinedLater,&l,true);
-           continue;
+         
           }
         }
         if(b->type==LABEL){
@@ -225,7 +225,7 @@ int firstPass(Queue* instructions,HashMap* h,FILE *file){
             strcpy(l.string,b->string);
             l.lineNumber=line; 
             enQueue(&labelsDefinedLater,&l,true);
-            continue;
+         
           }
         }
 

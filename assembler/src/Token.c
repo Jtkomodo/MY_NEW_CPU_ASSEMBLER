@@ -94,10 +94,7 @@ TOKEN* parseToToken(char* string,ERROR* error){
             };
             CAT(error->errorMessage,strings,3);
             errors=true;
-         }else{
-            printf("register %s",string);
          }
-         
 
 
      }else if(strstr(string,HEX_MARKER)==string){
