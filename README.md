@@ -1,5 +1,5 @@
 THis project was a lot of fun! This was my second revision of a Asmebler because I ran into a lot of issues that would have been
-fixed if I did a study of how Assemblers worked and this was the result of a lot of study.
+fixed if I did a study of how Assemblers worked and this was the beggining of that.
 
 I made a fully functional CPU(outside of programming some OP codes) out of logic gates using the logic gate simulator Logisim. 
 I did a ton of self teaching on how CPUs worked and wanted to create my own. I used a simple ROM chip to store all the opcode and would turn on the required
